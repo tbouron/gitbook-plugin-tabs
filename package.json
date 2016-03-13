@@ -1,0 +1,16 @@
+{
+  "name": "gitbook-plugin-tabs",
+  "description": "Clickable tabs for Gitbook pages",
+  "version": "0.0.1",
+  "license": "MIT",
+  "main": "index.js",
+  "engines": {
+    "gitbook": ">=2.4.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "gitbook-markdown": "^1.1.1"
+  }
+}
