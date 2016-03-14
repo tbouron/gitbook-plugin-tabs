@@ -4,7 +4,12 @@ var COUNTER = 0;
 function kitchenSink(block) {
   var isFirstTab = true;
 
-  var tabs = block.blocks.map(function(subBlock) {
+  // Filter out any blocks the user doesn't need
+  var blocks = block.blocks.filter(function(subBlock) {
+    return block.kwargs[subBlock.name];
+  });
+
+  var tabs = blocks.map(function(subBlock) {
     subBlock.id = subBlock.name + '-' + ++COUNTER;
     subBlock.isActive = false;
     var href = '#' + subBlock.id;
@@ -24,7 +29,7 @@ function kitchenSink(block) {
     `;
   }).join('');
 
-  var tabContent = block.blocks.map(function(subBlock) {
+  var tabContent = blocks.map(function(subBlock) {
     var classString = 'tab-pane';
     if (subBlock.isActive) {
       classString += ' active';
