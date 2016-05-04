@@ -20,7 +20,13 @@ function kitchenSink(block) {
       isFirstTab = false;
     }
 
-    return '<li role="presentation" class="${classString}"><a href="${href}" role="tab" data-toggle="tab">${block.kwargs[subBlock.name]}</a></li>';
+    return `
+      <li role="presentation" class="${classString}">
+        <a href="${href}" role="tab" data-toggle="tab">
+          ${block.kwargs[subBlock.name]}
+        </a>
+      </li>
+    `;
   }).join('');
 
   var tabContent = blocks.map(function(subBlock) {
@@ -29,10 +35,21 @@ function kitchenSink(block) {
       classString += ' active';
     }
 
-    return '<div role="tabpanel" class="${classString}" id="${subBlock.id}">${markdown.page(subBlock.body).content}</div>';
+    return `
+      <div role="tabpanel" class="${classString}" id="${subBlock.id}">
+        ${markdown.page(subBlock.body).content}
+      </div>
+    `;
   }).join('');
 
-  return '<ul class="nav nav-tabs" role="tablist">${tabs}</ul><div class="tab-content">${tabContent}</div>';
+  return `
+    <ul class="nav nav-tabs" role="tablist">
+      ${tabs}
+    </ul>
+    <div class="tab-content">
+      ${tabContent}
+    </div>
+  `;
 }
 
 module.exports = {
