@@ -1,59 +1,49 @@
-var markdown = require('gitbook-markdown');
-var COUNTER = 0;
+let markdown = require('gitbook-markdown');
 
-function kitchenSink(block) {
-  var isFirstTab = true;
-
-  // Filter out any blocks the user doesn't need
-  var blocks = block.blocks.filter(function(subBlock) {
-    return block.kwargs[subBlock.name];
-  });
-
-  var tabs = blocks.map(function(subBlock) {
-    subBlock.id = subBlock.name + '-' + ++COUNTER;
-    subBlock.isActive = false;
-    var href = '#' + subBlock.id;
-    var classString = '';
-    if (isFirstTab) {
-      classString = 'active';
-      subBlock.isActive = true;
-      isFirstTab = false;
-    }
-
+function processTabs(block) {
+  let isFirstTab = true;
+  let tabs = Object.keys(block.kwargs).filter(id => !id.startsWith('__')).map(id => {
+    let classes = isFirstTab ? 'active' : '';
+    isFirstTab = false;
     return `
-      <li role="presentation" class="${classString}">
-        <a href="${href}" role="tab" data-toggle="tab">
-          ${block.kwargs[subBlock.name]}
+      <li role="presentation" class="${classes}">
+        <a href="#${id}" role="tab" data-toggle="tab">
+          ${block.kwargs[id]}
         </a>
       </li>
     `;
-  }).join('');
+  });
 
-  var tabContent = blocks.map(function(subBlock) {
-    var classString = 'tab-pane';
-    if (subBlock.isActive) {
-      classString += ' active';
+  isFirstTab = true;
+  let content = block.blocks.filter(block => block.name === 'tab').map(block => {
+    let id = block.kwargs['id'];
+    let classes = ['tab-pane'];
+    if (block.kwargs['class']) {
+      classes.push(block.kwargs['class'].replace('active', ''));
     }
+    if (isFirstTab) {
+      classes.push('active');
+    }
+    isFirstTab = false;
 
     return `
-      <div role="tabpanel" class="${classString}" id="${subBlock.id}">
-        ${markdown.page(subBlock.body).content}
+      <div role="tabpanel" class="${classes.join(' ')}" id="${id}">
+        ${markdown.page(block.body).content}
       </div>
     `;
-  }).join('');
+  });
 
   return `
     <ul class="nav nav-tabs" role="tablist">
-      ${tabs}
+      ${tabs.join("\n")}
     </ul>
     <div class="tab-content">
-      ${tabContent}
+      ${content.join("\n")}
     </div>
   `;
 }
 
 module.exports = {
-
   book: {
     assets: './assets',
     css: [
@@ -66,11 +56,10 @@ module.exports = {
 
   blocks: {
     tabs: {
-      blocks: ['tab1', 'tab2', 'tab3', 'tab4', 'tab5', 'tab6', 'tab7', 'tab8', 'tab9', 'tab10'],
-      process: function(block) {
-        return kitchenSink(block);
+      blocks: ['tab', 'endtab'],
+      process: function (block) {
+        return processTabs(block);
       }
     }
   }
-
 };
